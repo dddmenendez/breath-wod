@@ -12,8 +12,14 @@
     "validate": "npm run typecheck && npm run lint && npm run build"
   },
   "dependencies": {
+    "dexie": "4.0.8",
+    "dexie-react-hooks": "1.1.7",
+    "framer-motion": "11.2.10",
+    "lucide-react": "0.383.0",
     "react": "18.3.1",
-    "react-dom": "18.3.1"
+    "react-dom": "18.3.1",
+    "react-router-dom": "6.23.1",
+    "zustand": "4.5.2"
   },
   "devDependencies": {
     "@types/node": "20.14.9",
