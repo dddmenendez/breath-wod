@@ -1,7 +1,14 @@
 import { create } from 'zustand'
 import { db } from '@/db/database'
+import {
+  scheduleNotification,
+  cancelScheduledNotification,
+} from '@/shared/utils/notifications'
 
 import type { FastingSession } from '../types/fasting.types'
+
+const NOTIF_WARNING_ID = 'fasting-warning'
+const NOTIF_TARGET_ID = 'fasting-target'
 
 const HISTORY_LIMIT = 30
 
@@ -52,6 +59,25 @@ export const useFastingStore = create<FastingState>((set, get) => ({
       const id = await db.fasting.add(session)
       const created = { ...session, id }
       set({ current: created })
+
+      const targetMs = targetHours * 60 * 60 * 1000
+      const warningMs = targetMs - 30 * 60 * 1000
+
+      if (warningMs > 0) {
+        scheduleNotification({
+          id: NOTIF_WARNING_ID,
+          title: 'A.R.M. Protocol',
+          body: '¡Faltan 30 minutos para completar tu ayuno!',
+          at: new Date(session.startTime.getTime() + warningMs),
+        })
+      }
+
+      scheduleNotification({
+        id: NOTIF_TARGET_ID,
+        title: 'A.R.M. Protocol',
+        body: '¡Objetivo de ayuno alcanzado! 💪',
+        at: new Date(session.startTime.getTime() + targetMs),
+      })
     } catch (err) {
       console.error('[fastingStore] startFast failed', err)
       set({ error: 'No se pudo iniciar el ayuno' })
@@ -75,6 +101,9 @@ export const useFastingStore = create<FastingState>((set, get) => ({
         actualHours,
         status,
       })
+
+      cancelScheduledNotification(NOTIF_WARNING_ID)
+      cancelScheduledNotification(NOTIF_TARGET_ID)
 
       const finished = { ...current, endTime, actualHours, status } as FastingSession
       set({ current: null })
