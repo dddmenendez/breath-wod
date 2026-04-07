@@ -44,7 +44,10 @@ export function useFastingTimer(session: FastingSession | null): UseFastingTimer
     }
   }
 
-  const startMs = session.startTime.getTime()
+  const startTime = session.startTime instanceof Date
+    ? session.startTime
+    : new Date(session.startTime)
+  const startMs = startTime.getTime()
   const targetMs = session.targetHours * 60 * 60 * 1000
   const elapsedMs = now - startMs
   const remainingMs = Math.max(0, targetMs - elapsedMs)

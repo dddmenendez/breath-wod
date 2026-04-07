@@ -12,6 +12,19 @@ const NOTIF_TARGET_ID = 'fasting-target'
 
 const HISTORY_LIMIT = 30
 
+function ensureDate(value: Date | string | number): Date {
+  if (value instanceof Date) return value
+  return new Date(value)
+}
+
+function normalizeSession(session: FastingSession): FastingSession {
+  return {
+    ...session,
+    startTime: ensureDate(session.startTime),
+    endTime: session.endTime ? ensureDate(session.endTime) : undefined,
+  }
+}
+
 interface FastingState {
   current: FastingSession | null
   history: FastingSession[]
@@ -123,7 +136,7 @@ export const useFastingStore = create<FastingState>((set, get) => ({
         .where('status')
         .equals('active')
         .first()
-      set({ current: active ?? null, loading: false })
+      set({ current: active ? normalizeSession(active) : null, loading: false })
     } catch (err) {
       console.error('[fastingStore] loadCurrent failed', err)
       set({ error: 'No se pudo cargar el ayuno actual', loading: false })
@@ -138,7 +151,7 @@ export const useFastingStore = create<FastingState>((set, get) => ({
         .reverse()
         .limit(HISTORY_LIMIT)
         .toArray()
-      set({ history: records, loading: false })
+      set({ history: records.map(normalizeSession), loading: false })
     } catch (err) {
       console.error('[fastingStore] loadHistory failed', err)
       set({ error: 'No se pudo cargar el historial', loading: false })
@@ -147,10 +160,11 @@ export const useFastingStore = create<FastingState>((set, get) => ({
 
   computeStreak: async () => {
     try {
-      const records = await db.fasting
+      const raw = await db.fasting
         .orderBy('startTime')
         .reverse()
         .toArray()
+      const records = raw.map(normalizeSession)
 
       let count = 0
       let checkDate = new Date()
