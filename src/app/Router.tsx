@@ -4,6 +4,7 @@ import FastingPage from '@/features/fasting/FastingPage'
 import MenuPage from '@/features/menu/MenuPage'
 import ShoppingPage from '@/features/shopping/ShoppingPage'
 import SupplementsPage from '@/features/supplements/SupplementsPage'
+import SettingsPage from '@/features/settings/SettingsPage'
 
 function AppRouter() {
   return (
@@ -13,6 +14,7 @@ function AppRouter() {
       <Route path="/menu" element={<MenuPage />} />
       <Route path="/shopping" element={<ShoppingPage />} />
       <Route path="/supplements" element={<SupplementsPage />} />
+      <Route path="/settings" element={<SettingsPage />} />
     </Routes>
   )
 }
