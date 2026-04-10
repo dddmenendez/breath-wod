@@ -104,7 +104,8 @@ export const useFastingStore = create<FastingState>((set, get) => ({
     set({ error: null })
     try {
       const endTime = new Date()
-      const elapsed = endTime.getTime() - current.startTime.getTime()
+      const startTime = ensureDate(current.startTime)
+      const elapsed = endTime.getTime() - startTime.getTime()
       const actualHours = elapsed / (1000 * 60 * 60)
       const reachedTarget = actualHours >= current.targetHours
       const status = reachedTarget ? 'completed' : 'broken'
