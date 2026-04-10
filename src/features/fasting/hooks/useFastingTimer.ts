@@ -12,10 +12,11 @@ interface UseFastingTimerReturn {
 }
 
 function formatTime(ms: number): string {
-  const totalMinutes = Math.floor(Math.abs(ms) / (1000 * 60))
-  const hours = Math.floor(totalMinutes / 60)
-  const minutes = totalMinutes % 60
-  return `${hours}h ${String(minutes).padStart(2, '0')}m`
+  const totalSeconds = Math.floor(Math.abs(ms) / 1000)
+  const hours = Math.floor(totalSeconds / 3600)
+  const minutes = Math.floor((totalSeconds % 3600) / 60)
+  const seconds = totalSeconds % 60
+  return `${hours}h ${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s`
 }
 
 export function useFastingTimer(session: FastingSession | null): UseFastingTimerReturn {
@@ -44,7 +45,10 @@ export function useFastingTimer(session: FastingSession | null): UseFastingTimer
     }
   }
 
-  const startMs = session.startTime.getTime()
+  const startTime = session.startTime instanceof Date
+    ? session.startTime
+    : new Date(session.startTime)
+  const startMs = startTime.getTime()
   const targetMs = session.targetHours * 60 * 60 * 1000
   const elapsedMs = now - startMs
   const remainingMs = Math.max(0, targetMs - elapsedMs)

@@ -91,4 +91,52 @@
 
 ---
 
+## Session 2026-04-07 (bugfix)
+
+**Duration:** ~15m
+**Agent:** Claude Opus 4.6 (Claude Code)
+
+**Bug report from Daniel:**
+- Timer stops working when navigating between app tabs
+- Fasting duration shows "0h 00m" after breaking a fast
+
+**Root cause:** IndexedDB/Dexie deserializes `Date` fields as ISO strings in some browsers. All code assumed `startTime` was always a `Date` object, so `.getTime()` calls failed silently, producing `NaN` for elapsed time calculations.
+
+**Fix applied:**
+- Added `ensureDate()` helper that safely converts string/number/Date → Date
+- Added `normalizeSession()` that normalizes `startTime` and `endTime` on every DB read
+- Applied in: `loadCurrent()`, `loadHistory()`, `computeStreak()`, `useFastingTimer()`
+
+**Files modified:**
+- `src/features/fasting/store/fastingStore.ts`
+- `src/features/fasting/hooks/useFastingTimer.ts`
+
+**Lesson learned:** Always normalize Date fields when reading from IndexedDB/Dexie. Consider adding this pattern to `ARCHITECTURE.md` as a best practice for future features.
+
+**Next recommended task:** Same as previous session — deploy + Lighthouse + smoke test on real device.
+
+---
+
+## Session 2026-04-10 (bugfix #2)
+
+**Duration:** ~10m
+**Agent:** Claude Opus 4.6 (Claude Code)
+
+**Bug report from Daniel:**
+- Timer still doesn't update in real-time after previous fix
+
+**Root cause:** `formatTime()` only displayed hours and minutes (`Xh YYm`), not seconds. The timer interval updated `now` every second correctly, but the visible text only changed once per minute — appearing frozen for up to 59 seconds.
+
+**Fix applied:**
+- `formatTime()` now includes seconds: `Xh YYm SSs` — updates visually every second
+- Added `ensureDate()` safety in `breakFast()` for the elapsed duration calculation
+
+**Files modified:**
+- `src/features/fasting/hooks/useFastingTimer.ts` — formatTime with seconds
+- `src/features/fasting/store/fastingStore.ts` — ensureDate in breakFast
+
+**Next recommended task:** Same as before — deploy + smoke test on real device.
+
+---
+
 <!-- Future sessions append below this line -->
