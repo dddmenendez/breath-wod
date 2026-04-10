@@ -135,6 +135,8 @@
 - `src/features/fasting/hooks/useFastingTimer.ts` — formatTime with seconds
 - `src/features/fasting/store/fastingStore.ts` — ensureDate in breakFast
 
+**PR:** dddmenendez/breath-wod#2 — merged 2026-04-10
+
 **Next recommended task:** Same as before — deploy + smoke test on real device.
 
 ---
